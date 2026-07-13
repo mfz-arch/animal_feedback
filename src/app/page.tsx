@@ -27,8 +27,22 @@ export default function Home() {
   const [name, setName] = useState('');
   const [comment, setComment] = useState('');
 
-  // Close modal on escape
+  // Fetch feedback and close modal on escape
   useEffect(() => {
+    fetch('/api/feedback')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const grouped: Record<string, {name: string, text: string, date: string}[]> = {};
+          data.forEach(fb => {
+            if (!grouped[fb.animalId]) grouped[fb.animalId] = [];
+            grouped[fb.animalId].push(fb);
+          });
+          setFeedbacks(grouped);
+        }
+      })
+      .catch(console.error);
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setSelectedAnimal(null);
     };
@@ -36,23 +50,40 @@ export default function Home() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !comment.trim() || !selectedAnimal) return;
 
     const newFeedback = {
+      animalId: selectedAnimal.id,
       name: name.trim(),
       text: comment.trim(),
       date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
     };
 
-    setFeedbacks(prev => ({
-      ...prev,
-      [selectedAnimal.id]: [...(prev[selectedAnimal.id] || []), newFeedback]
-    }));
+    try {
+      const response = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newFeedback)
+      });
 
-    setName('');
-    setComment('');
+      if (response.ok) {
+        const savedFeedback = await response.json();
+        setFeedbacks(prev => ({
+          ...prev,
+          [selectedAnimal.id]: [...(prev[selectedAnimal.id] || []), savedFeedback]
+        }));
+        setName('');
+        setComment('');
+      } else {
+        console.error('Failed to save feedback');
+      }
+    } catch (error) {
+      console.error('Error saving feedback', error);
+    }
   };
 
   return (
