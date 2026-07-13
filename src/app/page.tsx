@@ -28,6 +28,7 @@ export default function Home() {
   const [name, setName] = useState('');
   const [comment, setComment] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   // Fetch feedback and close modal on escape
   useEffect(() => {
@@ -80,13 +81,18 @@ export default function Home() {
         }));
         setName('');
         setComment('');
+        setErrorMsg('');
         setShowSuccess(true);
         setTimeout(() => setShowSuccess(false), 3000);
       } else {
         console.error('Failed to save feedback');
+        setErrorMsg('Failed to save. Did you add Firebase keys to Vercel Environment Variables?');
+        setTimeout(() => setErrorMsg(''), 7000);
       }
     } catch (error) {
       console.error('Error saving feedback', error);
+      setErrorMsg('A network error occurred while posting your feedback.');
+      setTimeout(() => setErrorMsg(''), 7000);
     }
   };
 
@@ -207,6 +213,27 @@ export default function Home() {
           animation: 'fadeIn 0.3s ease-in-out'
         }}>
           <span>✅</span> Feedback published successfully!
+        </div>
+      )}
+
+      {errorMsg && (
+        <div style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          background: '#dc3545',
+          color: 'white',
+          padding: '16px 24px',
+          borderRadius: '12px',
+          boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
+          zIndex: 9999,
+          fontWeight: 600,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          animation: 'fadeIn 0.3s ease-in-out'
+        }}>
+          <span>❌</span> {errorMsg}
         </div>
       )}
     </main>
