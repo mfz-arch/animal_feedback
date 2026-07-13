@@ -27,6 +27,7 @@ export default function Home() {
   const [feedbacks, setFeedbacks] = useState<Record<string, {name: string, text: string, date: string}[]>>({});
   const [name, setName] = useState('');
   const [comment, setComment] = useState('');
+  const [showSuccess, setShowSuccess] = useState(false);
 
   // Fetch feedback and close modal on escape
   useEffect(() => {
@@ -79,6 +80,8 @@ export default function Home() {
         }));
         setName('');
         setComment('');
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
       } else {
         console.error('Failed to save feedback');
       }
@@ -183,6 +186,27 @@ export default function Home() {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {showSuccess && (
+        <div style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          background: 'var(--primary)',
+          color: 'white',
+          padding: '16px 24px',
+          borderRadius: '12px',
+          boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
+          zIndex: 9999,
+          fontWeight: 600,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          animation: 'fadeIn 0.3s ease-in-out'
+        }}>
+          <span>✅</span> Feedback published successfully!
         </div>
       )}
     </main>
