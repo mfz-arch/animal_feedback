@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 // Sample animal data
-const initialAnimals = [
+export const initialAnimals = [
   {
     id: '1',
     title: 'Sunny Golden Retriever',
@@ -88,9 +89,14 @@ export default function Home() {
 
   return (
     <main className="container">
-      <header className="header">
-        <h1>Animal Impressions</h1>
-        <p>A premium gallery to share your thoughts on nature's finest.</p>
+      <header className="header" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+        <div>
+          <h1>Animal Impressions</h1>
+          <p>A premium gallery to share your thoughts on nature's finest.</p>
+        </div>
+        <Link href="/global-feed" className="btn" style={{ textDecoration: 'none', display: 'inline-block' }}>
+          View All Impressions
+        </Link>
       </header>
 
       <div className="masonry-grid">
